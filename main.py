@@ -7,8 +7,12 @@ from pygame_menu import sound
 import project_colors
 import random
 
+pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
 bg_image = pygame.image.load('images/wallpaper.png')
+
+
+
 
 SIZE_BLOCK = 24
 MARGIN = 1
@@ -26,7 +30,7 @@ FRAME_COLOR = project_colors.BACKGROUND
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Snake')
 timer = pygame.time.Clock()
-MyFont = pygame.font.SysFont('Comic Sans MS', 36) # Open Sans
+MyFont = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 32)
 
 
 class SnakeBlock():
@@ -49,7 +53,11 @@ def draw_block(color, row, column):
                                      SIZE_BLOCK])
 
 def start_the_game():
+    pygame.mixer.music.load('sounds/Chiptronical.ogg')
+    pygame.mixer.music.play(loops=-1)
 
+    sound_eating = pygame.mixer.Sound("sounds/mixkit-arcade-bonus-alert-767.wav")
+    crash_sound = pygame.mixer.Sound("sounds/mixkit-retro-arcade-game-over-470.wav")
 
     def get_random_empty_block():
         x = random.randint(0, COUNT_BLOCKS - 1)
@@ -70,7 +78,8 @@ def start_the_game():
     delta1 = random.randint(2, 21)
     delta2 = random.randint(2, 7)
 
-
+    flPause = False
+    vol = 0.3
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -91,6 +100,20 @@ def start_the_game():
                 elif event.key == pygame.K_RIGHT and d_row != 0:
                     buf_row = 0
                     buf_col = +1
+                elif event.key == pygame.K_SPACE:
+                    flPause = not flPause
+                    if flPause:
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
+                elif event.key == pygame.K_z:
+                    vol -= 0.1
+                    pygame.mixer.music.set_volume(vol)
+                    print(pygame.mixer.music.get_volume())
+                elif event.key == pygame.K_a:
+                    vol += 0.1
+                    pygame.mixer.music.set_volume(vol)
+                    print(pygame.mixer.music.get_volume())
 
         screen.fill(FRAME_COLOR)
         pygame.draw.rect(screen, project_colors.LIGHT_BLUE, [0, 0, size[0], HEADER_MARGIN])
@@ -112,14 +135,17 @@ def start_the_game():
 
         head = snake_blocks[-1]
         if not head.is_inside():
+            pygame.mixer.music.stop()
+            crash_sound.play()
             time.sleep(1)
             print(f"crush: {total} point.")
             break
 
 
-
-
-        draw_block(project_colors.LIGHT_RED, apple.x, apple.y)
+        if random.randint(1, 2)%2 == True:
+            draw_block(project_colors.LIGHT_RED, apple.x, apple.y)
+        else:
+            draw_block(project_colors.DARK_RED, apple.x, apple.y)
 
         for block in snake_blocks:
             if block == head:
@@ -129,6 +155,8 @@ def start_the_game():
 
         pygame.display.flip()
         if apple == head:
+            sound_eating.set_volume(0.3)
+            sound_eating.play()
             total += 1
             speed = total//5 + 1
             snake_blocks.insert(0, apple)
@@ -141,6 +169,8 @@ def start_the_game():
         new_head = SnakeBlock(head.x + d_row, head.y + d_col)
 
         if new_head in snake_blocks:
+            pygame.mixer.music.stop()
+            crash_sound.play()
             time.sleep(1)
             print(f"crush yourself: {total} point.")
             break
@@ -152,12 +182,15 @@ def start_the_game():
         timer.tick(speed+2)
 
 
-main_theme = pygame_menu.themes.THEME_DARK.copy()
+main_theme = pygame_menu.themes.THEME_MY_SNAKE.copy()
 main_theme.set_background_color_opacity(0.7)
 
-menu = pygame_menu.Menu('Welcome', 450, 250,
-                       theme=main_theme)
+engine = sound.Sound()
+engine.set_sound(sound.SOUND_TYPE_CLICK_MOUSE, 'sounds/mixkit-arcade-bonus-229.wav')
 
+menu = pygame_menu.Menu('Welcome', 450, 250, theme=main_theme)
+
+menu.set_sound(engine, recursive=True)  # Apply on menu and all sub-menus
 menu.add.text_input('Name :', default='Chuck Norris')
 menu.add.button('Play', start_the_game)
 menu.add.button('Quit', pygame_menu.events.EXIT)
