@@ -6,6 +6,7 @@ import pygame_menu
 from pygame_menu import sound
 import project_colors
 import random
+from database import *
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
@@ -23,7 +24,6 @@ HEADER_MARGIN = (SIZE_BLOCK+MARGIN)*4
 
 size = [SIZE_BLOCK*COUNT_BLOCKS + 2*SIZE_BLOCK + MARGIN*COUNT_BLOCKS,
         SIZE_BLOCK*COUNT_BLOCKS + 2*SIZE_BLOCK + MARGIN*COUNT_BLOCKS + HEADER_MARGIN]
-print(size)
 FRAME_COLOR = project_colors.BACKGROUND
 
 
@@ -53,8 +53,9 @@ def draw_block(color, row, column):
                                      SIZE_BLOCK])
 
 def start_the_game():
-    pygame.mixer.music.load('sounds/Chiptronical.ogg')
-    pygame.mixer.music.play(loops=-1)
+    pygame.mouse.set_visible(False)
+    #pygame.mixer.music.load('sounds/Chiptronical.mp3')
+    #pygame.mixer.music.play(loops=-1)
 
     sound_eating = pygame.mixer.Sound("sounds/mixkit-arcade-bonus-alert-767.wav")
     crash_sound = pygame.mixer.Sound("sounds/mixkit-retro-arcade-game-over-470.wav")
@@ -100,27 +101,28 @@ def start_the_game():
                 elif event.key == pygame.K_RIGHT and d_row != 0:
                     buf_row = 0
                     buf_col = +1
-                elif event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_BREAK:
                     flPause = not flPause
                     if flPause:
                         pygame.mixer.music.pause()
                     else:
                         pygame.mixer.music.unpause()
-                elif event.key == pygame.K_z:
+                elif event.key == pygame.K_1:
                     vol -= 0.1
                     pygame.mixer.music.set_volume(vol)
                     print(pygame.mixer.music.get_volume())
-                elif event.key == pygame.K_a:
+                elif event.key == pygame.K_2:
                     vol += 0.1
                     pygame.mixer.music.set_volume(vol)
                     print(pygame.mixer.music.get_volume())
-
+            elif event.type == pygame.K_UP:
+                pass
         screen.fill(FRAME_COLOR)
         pygame.draw.rect(screen, project_colors.LIGHT_BLUE, [0, 0, size[0], HEADER_MARGIN])
 
 
-        text_total = MyFont.render(f"Your score: {total}", 0, project_colors.WHITE)
-        text_speed = MyFont.render(f"Snake speed: {speed}", 0, project_colors.WHITE)
+        text_total = MyFont.render(f"Score: {total}", 0, project_colors.WHITE)
+        text_speed = MyFont.render(f"Speed: {speed}", 0, project_colors.WHITE)
         screen.blit(text_total, (SIZE_BLOCK, 0.3*SIZE_BLOCK))
         screen.blit(text_speed, (SIZE_BLOCK, 1.8*SIZE_BLOCK))
 
