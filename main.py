@@ -13,36 +13,32 @@ pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
 bg_image = pygame.image.load('images/wallpaper.png')
 
-
-
-
 SIZE_BLOCK = 24
 MARGIN = 1
 COUNT_BLOCKS = 30
-HEADER_MARGIN = (SIZE_BLOCK+MARGIN)*4
-size = [SIZE_BLOCK*COUNT_BLOCKS + 2*SIZE_BLOCK + MARGIN*COUNT_BLOCKS,
-        SIZE_BLOCK*COUNT_BLOCKS + 2*SIZE_BLOCK + MARGIN*COUNT_BLOCKS + HEADER_MARGIN]
+HEADER_MARGIN = (SIZE_BLOCK + MARGIN) * 4
+size = [SIZE_BLOCK * COUNT_BLOCKS + 2 * SIZE_BLOCK + MARGIN * COUNT_BLOCKS,
+        SIZE_BLOCK * COUNT_BLOCKS + 2 * SIZE_BLOCK + MARGIN * COUNT_BLOCKS + HEADER_MARGIN]
 FRAME_COLOR = project_colors.BACKGROUND
-
 
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Snake')
 timer = pygame.time.Clock()
+
 MyFont = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 24)
 BEST_USERS = get_best()
-
 
 
 def draw_top_users():
     font_result = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 24)
     font_user = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 20)
     text_header = font_result.render('Best scores:', True, project_colors.WHITE)
-    screen.blit(text_header, (25*(SIZE_BLOCK+MARGIN), -5))
+    screen.blit(text_header, (25 * (SIZE_BLOCK + MARGIN), -5))
     for index, user in enumerate(BEST_USERS):
         user_name, user_score = user
         s = f"{index + 1}. {user_name}: {user_score}"
         text_user = font_user.render(s, True, project_colors.WHITE)
-        screen.blit(text_user, (25*(SIZE_BLOCK+MARGIN), 23*(index+1)))
+        screen.blit(text_user, (25 * (SIZE_BLOCK + MARGIN), 23 * (index + 1)))
         print(index, user_name, user_score)
 
 
@@ -58,16 +54,16 @@ class SnakeBlock():
         return isinstance(other, SnakeBlock) and self.x == other.x and self.y == other.y
 
 
-
 def draw_block(color, row, column):
-    pygame.draw.rect(screen, color, [SIZE_BLOCK + column*(SIZE_BLOCK + MARGIN),
-                                     HEADER_MARGIN + SIZE_BLOCK + row*(SIZE_BLOCK + MARGIN),
+    pygame.draw.rect(screen, color, [SIZE_BLOCK + column * (SIZE_BLOCK + MARGIN),
+                                     HEADER_MARGIN + SIZE_BLOCK + row * (SIZE_BLOCK + MARGIN),
                                      SIZE_BLOCK,
                                      SIZE_BLOCK])
 
+
 def start_the_game():
-    # theme_sound = pygame.mixer.Sound("sounds/Chiptronical.mp3")
-    # theme_sound.play(loops=-1)
+    pygame.mixer.music.load("sounds/Chiptronical.mp3")
+    pygame.mixer.music.play(loops=-1)
     pygame.mouse.set_visible(False)
     sound_eating = pygame.mixer.Sound("sounds/mixkit-arcade-bonus-alert-767.wav")
     crash_sound = pygame.mixer.Sound("sounds/mixkit-retro-arcade-game-over-470.wav")
@@ -87,15 +83,18 @@ def start_the_game():
     d_row = buf_row = 0
     d_col = buf_col = 1
     total = 0
+
     speed = 1
     delta1 = random.randint(2, 21)
     delta2 = random.randint(2, 7)
 
     flPause = False
-    vol = 0.3
+    vol = 0.2
+    pygame.mixer.music.set_volume(vol)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.mixer.music.stop()
                 time.sleep(1)
                 print('exit')
                 pygame.quit()
@@ -113,17 +112,17 @@ def start_the_game():
                 elif event.key == pygame.K_RIGHT and d_row != 0:
                     buf_row = 0
                     buf_col = +1
-                elif event.key == pygame.K_BREAK:
+                elif event.key == pygame.K_SPACE:
                     flPause = not flPause
                     if flPause:
                         pygame.mixer.music.pause()
                     else:
                         pygame.mixer.music.unpause()
-                elif event.key == pygame.K_1:
+                elif event.key == pygame.K_z:
                     vol -= 0.1
                     pygame.mixer.music.set_volume(vol)
                     print(pygame.mixer.music.get_volume())
-                elif event.key == pygame.K_2:
+                elif event.key == pygame.K_a:
                     vol += 0.1
                     pygame.mixer.music.set_volume(vol)
                     print(pygame.mixer.music.get_volume())
@@ -137,17 +136,15 @@ def start_the_game():
         text_total = MyFont.render(f"Score: {total}", 0, project_colors.WHITE)
         text_speed = MyFont.render(f"Speed: {speed}", 0, project_colors.WHITE)
         screen.blit(text_user, (SIZE_BLOCK, 0))
-        screen.blit(text_total, (SIZE_BLOCK, SIZE_BLOCK+5))
-        screen.blit(text_speed, (SIZE_BLOCK, 2*SIZE_BLOCK+10))
+        screen.blit(text_total, (SIZE_BLOCK, SIZE_BLOCK + 5))
+        screen.blit(text_speed, (SIZE_BLOCK, 2 * SIZE_BLOCK + 10))
 
         for row in range(COUNT_BLOCKS):
             for column in range(COUNT_BLOCKS):
-                if (row*column)%delta1 == delta2:
+                if (row * column) % delta1 == delta2:
                     draw_block(project_colors.LIGHT_GREEN, row, column)
                 else:
                     draw_block(project_colors.DARK_GREEN, row, column)
-
-
 
         head = snake_blocks[-1]
         if not head.is_inside():
@@ -157,8 +154,7 @@ def start_the_game():
             print(f"crush: {total} point.")
             break
 
-
-        if random.randint(1, 2)%2 == True:
+        if random.randint(1, 2) % 2 == True:
             draw_block(project_colors.LIGHT_RED, apple.x, apple.y)
         else:
             draw_block(project_colors.DARK_RED, apple.x, apple.y)
@@ -171,13 +167,12 @@ def start_the_game():
 
         pygame.display.flip()
         if apple == head:
-            sound_eating.set_volume(0.3)
+            sound_eating.set_volume(0.2)
             sound_eating.play()
             total += 1
-            speed = total//5 + 1
+            speed = total // 5 + 1
             snake_blocks.insert(0, apple)
             apple = get_random_empty_block()
-
 
         d_row = buf_row
         d_col = buf_col
@@ -195,11 +190,10 @@ def start_the_game():
         snake_blocks.pop(0)
 
         pygame.display.flip()
-        timer.tick(speed+2)
+        timer.tick(speed + 2)
 
 
-
-
+# Menu options
 main_theme = pygame_menu.themes.THEME_MY_SNAKE.copy()
 main_theme.set_background_color_opacity(0.7)
 
@@ -224,4 +218,3 @@ while True:
         menu.draw(screen)
 
     pygame.display.update()
-
