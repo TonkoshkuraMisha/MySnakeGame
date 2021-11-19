@@ -1,6 +1,7 @@
 import sys
+import os
 import time
-
+import json
 import pygame
 import pygame_menu
 from pygame_menu import sound
@@ -18,10 +19,7 @@ bg_image = pygame.image.load('images/wallpaper.png')
 SIZE_BLOCK = 24
 MARGIN = 1
 COUNT_BLOCKS = 30
-
-
 HEADER_MARGIN = (SIZE_BLOCK+MARGIN)*4
-
 size = [SIZE_BLOCK*COUNT_BLOCKS + 2*SIZE_BLOCK + MARGIN*COUNT_BLOCKS,
         SIZE_BLOCK*COUNT_BLOCKS + 2*SIZE_BLOCK + MARGIN*COUNT_BLOCKS + HEADER_MARGIN]
 FRAME_COLOR = project_colors.BACKGROUND
@@ -30,7 +28,22 @@ FRAME_COLOR = project_colors.BACKGROUND
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Snake')
 timer = pygame.time.Clock()
-MyFont = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 32)
+MyFont = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 24)
+BEST_USERS = get_best()
+
+
+
+def draw_top_users():
+    font_result = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 24)
+    font_user = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 20)
+    text_header = font_result.render('Best scores:', True, project_colors.WHITE)
+    screen.blit(text_header, (25*(SIZE_BLOCK+MARGIN), -5))
+    for index, user in enumerate(BEST_USERS):
+        user_name, user_score = user
+        s = f"{index + 1}. {user_name}: {user_score}"
+        text_user = font_user.render(s, True, project_colors.WHITE)
+        screen.blit(text_user, (25*(SIZE_BLOCK+MARGIN), 23*(index+1)))
+        print(index, user_name, user_score)
 
 
 class SnakeBlock():
@@ -53,10 +66,9 @@ def draw_block(color, row, column):
                                      SIZE_BLOCK])
 
 def start_the_game():
+    # theme_sound = pygame.mixer.Sound("sounds/Chiptronical.mp3")
+    # theme_sound.play(loops=-1)
     pygame.mouse.set_visible(False)
-    #pygame.mixer.music.load('sounds/Chiptronical.mp3')
-    #pygame.mixer.music.play(loops=-1)
-
     sound_eating = pygame.mixer.Sound("sounds/mixkit-arcade-bonus-alert-767.wav")
     crash_sound = pygame.mixer.Sound("sounds/mixkit-retro-arcade-game-over-470.wav")
 
@@ -120,11 +132,13 @@ def start_the_game():
         screen.fill(FRAME_COLOR)
         pygame.draw.rect(screen, project_colors.LIGHT_BLUE, [0, 0, size[0], HEADER_MARGIN])
 
-
+        draw_top_users()
+        text_user = MyFont.render(f"User: {USER_NAME.get_value()}", 0, project_colors.WHITE)
         text_total = MyFont.render(f"Score: {total}", 0, project_colors.WHITE)
         text_speed = MyFont.render(f"Speed: {speed}", 0, project_colors.WHITE)
-        screen.blit(text_total, (SIZE_BLOCK, 0.3*SIZE_BLOCK))
-        screen.blit(text_speed, (SIZE_BLOCK, 1.8*SIZE_BLOCK))
+        screen.blit(text_user, (SIZE_BLOCK, 0))
+        screen.blit(text_total, (SIZE_BLOCK, SIZE_BLOCK+5))
+        screen.blit(text_speed, (SIZE_BLOCK, 2*SIZE_BLOCK+10))
 
         for row in range(COUNT_BLOCKS):
             for column in range(COUNT_BLOCKS):
@@ -184,6 +198,8 @@ def start_the_game():
         timer.tick(speed+2)
 
 
+
+
 main_theme = pygame_menu.themes.THEME_MY_SNAKE.copy()
 main_theme.set_background_color_opacity(0.7)
 
@@ -191,16 +207,13 @@ engine = sound.Sound()
 engine.set_sound(sound.SOUND_TYPE_CLICK_MOUSE, 'sounds/mixkit-arcade-bonus-229.wav')
 
 menu = pygame_menu.Menu('Welcome', 450, 250, theme=main_theme)
-
 menu.set_sound(engine, recursive=True)  # Apply on menu and all sub-menus
-menu.add.text_input('Name :', default='Chuck Norris')
+USER_NAME = menu.add.text_input('Name :', default='Chuck Norris')
 menu.add.button('Play', start_the_game)
 menu.add.button('Quit', pygame_menu.events.EXIT)
 
 while True:
-
     screen.blit(bg_image, (-5, 0))
-
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
@@ -211,3 +224,4 @@ while True:
         menu.draw(screen)
 
     pygame.display.update()
+
