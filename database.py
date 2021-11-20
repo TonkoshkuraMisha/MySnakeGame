@@ -25,8 +25,3 @@ def get_best():
     LIMIT 3
     """)
     return cursor.fetchall()
-
-# insert_result('Tolja', 512)
-# print(get_best())
-
-# cursor.close()

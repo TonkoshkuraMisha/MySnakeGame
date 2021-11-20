@@ -1,7 +1,5 @@
 import sys
-import os
 import time
-import json
 import pygame
 import pygame_menu
 from pygame_menu import sound
@@ -33,12 +31,12 @@ def draw_top_users():
     font_result = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 24)
     font_user = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 20)
     text_header = font_result.render('Best scores:', True, project_colors.WHITE)
-    screen.blit(text_header, (25 * (SIZE_BLOCK + MARGIN), -5))
+    screen.blit(text_header, (23 * (SIZE_BLOCK + MARGIN), -5))
     for index, user in enumerate(BEST_USERS):
         user_name, user_score = user
         s = f"{index + 1}. {user_name}: {user_score}"
         text_user = font_user.render(s, True, project_colors.WHITE)
-        screen.blit(text_user, (25 * (SIZE_BLOCK + MARGIN), 23 * (index + 1)))
+        screen.blit(text_user, (23 * (SIZE_BLOCK + MARGIN), 23 * (index + 1)))
         print(index, user_name, user_score)
 
 
@@ -97,9 +95,7 @@ def start_the_game():
             if event.type == pygame.QUIT:
                 pygame.mixer.music.stop()
                 time.sleep(1)
-                #print('exit')
                 insert_result(USER_NAME.get_value(), score)
-                save_game()
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
@@ -154,9 +150,7 @@ def start_the_game():
             pygame.mixer.music.stop()
             crash_sound.play()
             time.sleep(1)
-            #print(f"crush: {total} point.")
             insert_result(USER_NAME.get_value(), score)
-            save_game()
             break
 
         if random.randint(1, 2) % 2 == True:
@@ -188,9 +182,7 @@ def start_the_game():
             pygame.mixer.music.stop()
             crash_sound.play()
             time.sleep(1)
-            #print(f"crush yourself: {total} point.")
             insert_result(USER_NAME.get_value(), score)
-            save_game()
             break
 
         snake_blocks.append(new_head)
@@ -198,14 +190,6 @@ def start_the_game():
 
         pygame.display.flip()
         timer.tick(speed + 2)
-
-def save_game():
-    data = {
-        'user': USER_NAME.get_value(),
-        'score': score,
-    }
-    with open('data.txt', 'w') as outfile:
-        json.dump(data, outfile)
 
 # Menu options
 main_theme = pygame_menu.themes.THEME_MY_SNAKE.copy()
@@ -226,6 +210,7 @@ while True:
     for event in events:
         if event.type == pygame.QUIT:
             exit()
+
 
     if menu.is_enabled():
         menu.update(events)
