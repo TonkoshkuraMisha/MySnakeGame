@@ -61,6 +61,7 @@ def draw_block(color, row, column):
                                      SIZE_BLOCK])
 
 
+
 def start_the_game():
     pygame.mixer.music.load("sounds/Chiptronical.mp3")
     pygame.mixer.music.play(loops=-1)
@@ -82,8 +83,8 @@ def start_the_game():
 
     d_row = buf_row = 0
     d_col = buf_col = 1
-    total = 0
-
+    global score
+    score = 0
     speed = 1
     delta1 = random.randint(2, 21)
     delta2 = random.randint(2, 7)
@@ -96,7 +97,9 @@ def start_the_game():
             if event.type == pygame.QUIT:
                 pygame.mixer.music.stop()
                 time.sleep(1)
-                print('exit')
+                #print('exit')
+                insert_result(USER_NAME.get_value(), score)
+                save_game()
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
@@ -133,7 +136,7 @@ def start_the_game():
 
         draw_top_users()
         text_user = MyFont.render(f"User: {USER_NAME.get_value()}", 0, project_colors.WHITE)
-        text_total = MyFont.render(f"Score: {total}", 0, project_colors.WHITE)
+        text_total = MyFont.render(f"Score: {score}", 0, project_colors.WHITE)
         text_speed = MyFont.render(f"Speed: {speed}", 0, project_colors.WHITE)
         screen.blit(text_user, (SIZE_BLOCK, 0))
         screen.blit(text_total, (SIZE_BLOCK, SIZE_BLOCK + 5))
@@ -151,7 +154,9 @@ def start_the_game():
             pygame.mixer.music.stop()
             crash_sound.play()
             time.sleep(1)
-            print(f"crush: {total} point.")
+            #print(f"crush: {total} point.")
+            insert_result(USER_NAME.get_value(), score)
+            save_game()
             break
 
         if random.randint(1, 2) % 2 == True:
@@ -169,8 +174,8 @@ def start_the_game():
         if apple == head:
             sound_eating.set_volume(0.2)
             sound_eating.play()
-            total += 1
-            speed = total // 5 + 1
+            score += 1
+            speed = score // 5 + 1
             snake_blocks.insert(0, apple)
             apple = get_random_empty_block()
 
@@ -183,7 +188,9 @@ def start_the_game():
             pygame.mixer.music.stop()
             crash_sound.play()
             time.sleep(1)
-            print(f"crush yourself: {total} point.")
+            #print(f"crush yourself: {total} point.")
+            insert_result(USER_NAME.get_value(), score)
+            save_game()
             break
 
         snake_blocks.append(new_head)
@@ -192,6 +199,13 @@ def start_the_game():
         pygame.display.flip()
         timer.tick(speed + 2)
 
+def save_game():
+    data = {
+        'user': USER_NAME.get_value(),
+        'score': score,
+    }
+    with open('data.txt', 'w') as outfile:
+        json.dump(data, outfile)
 
 # Menu options
 main_theme = pygame_menu.themes.THEME_MY_SNAKE.copy()
