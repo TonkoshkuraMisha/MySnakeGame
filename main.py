@@ -23,7 +23,6 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Snake')
 timer = pygame.time.Clock()
 
-# MyFont = pygame.font.Font('fonts/open-sans/ttf/OpenSans-Bold.ttf', 24)
 MyFont = pygame.font.SysFont('Verdana', 24)
 BEST_USERS = get_best()
 
