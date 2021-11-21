@@ -88,14 +88,13 @@ def start_the_game():
     delta2 = random.randint(2, 7)
 
     flPause = False
-    vol = 0.2
+    vol = 0.1
     pygame.mixer.music.set_volume(vol)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.mixer.music.stop()
                 time.sleep(1)
-                insert_result(USER_NAME.get_value(), score)
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
@@ -200,7 +199,7 @@ engine.set_sound(sound.SOUND_TYPE_CLICK_MOUSE, 'sounds/mixkit-arcade-bonus-229.w
 
 menu = pygame_menu.Menu('Welcome', 450, 250, theme=main_theme)
 menu.set_sound(engine, recursive=True)  # Apply on menu and all sub-menus
-USER_NAME = menu.add.text_input('Name :', default='Chuck Norris')
+USER_NAME = menu.add.text_input('Name: ', default='User')
 menu.add.button('Play', start_the_game)
 menu.add.button('Quit', pygame_menu.events.EXIT)
 
