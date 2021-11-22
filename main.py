@@ -31,12 +31,12 @@ def draw_top_users():
     font_result = pygame.font.SysFont('Verdana', 24)
     font_user = pygame.font.SysFont('Verdana', 20)
     text_header = font_result.render('Best scores:', True, project_colors.WHITE)
-    screen.blit(text_header, (23 * (SIZE_BLOCK + MARGIN), 0))
+    screen.blit(text_header, (21 * (SIZE_BLOCK + MARGIN), 0))
     for index, user in enumerate(BEST_USERS):
         user_name, user_score = user
         s = f"{index + 1}. {user_name}: {user_score}"
         text_user = font_user.render(s, True, project_colors.WHITE)
-        screen.blit(text_user, (23 * (SIZE_BLOCK + MARGIN), 23 * (index + 1)+2))
+        screen.blit(text_user, (21 * (SIZE_BLOCK + MARGIN), 23 * (index + 1)+2))
         print(index, user_name, user_score)
 
 
@@ -61,7 +61,7 @@ def draw_block(color, row, column):
 
 
 def start_the_game():
-    pygame.mixer.music.load("sounds/Chiptronical.mp3")
+    pygame.mixer.music.load("sounds/Chiptronical.ogg")
     pygame.mixer.music.play(loops=-1)
     pygame.mouse.set_visible(False)
     sound_eating = pygame.mixer.Sound("sounds/mixkit-arcade-bonus-alert-767.wav")
